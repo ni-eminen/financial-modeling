@@ -7,6 +7,8 @@ import itertools
 from scipy.stats import gaussian_kde
 import time
 
+from Sampler import Sampler
+
 
 class Operator:
     def __init__(self, quantities: list[str], samplers: dict):
@@ -19,9 +21,9 @@ class Operator:
 
     def sample(self, quantities: list[str], sample_n: int):
         for q in quantities:
-            self.quantities[q]['samples'] = self.quantities[q]['sampler'].rvs(sample_n)
+            self.quantities[q]['samples'] = self.quantities[q]['sampler'].rvs(size=sample_n)
 
-        return self.quantity_samples
+        return self.quantities
 
     def convolution(self, quantities: tuple[str], operation: str):
         """
@@ -30,10 +32,10 @@ class Operator:
         :return: A convolved distribution
         """
         for q in quantities:
-            if self.quantity_samples[q]['samples'] == []:
+            if len(self.quantities[q]['samples']) == 0:
                 self.sample([q], 1000)
 
-        a, b = self.quantity_samples[quantities[0]], self.quantity_samples[quantities[1]]
+        a, b = self.quantities[quantities[0]]['samples'], self.quantities[quantities[1]]['samples']
 
         z = itertools.product(a, b)
         if operation == '+':
@@ -60,18 +62,21 @@ class Operator:
     #
     #     return probability
 
-    def distribution_cdf(self, amt, distribution):
+    def distribution_cdf(self, amt, distribution, ceil=10000):
         interpolated = self.distribution_interpolation(distribution)
-        val = self.interpolated_integral(amt, np.inf, interpolated)
-        tot = self.interpolated_integral(-np.inf, np.inf, interpolated)
+        val = self.interpolated_integral(amt, ceil, interpolated)
+        tot = self.interpolated_integral(0, ceil, interpolated)
 
         return val / tot
 
+    # TODO: Here the x is wrong, the y's did not come from those x's, they were sampled and we don't know the
+    # TODO: x's at this point. We can find out the x's with the inverse of the cdf, PPF
     def distribution_interpolation(self, distribution):
-        return scipy.interpolate.interp1d(distribution)
+        return scipy.interpolate.interp1d(x=list(range(len(distribution))), y=distribution, fill_value="extrapolate")
 
     def interpolated_integral(self, a, b, f):
         result, error = scipy.integrate.quad(f, a, b)
+
         return result
 
 
@@ -91,9 +96,10 @@ def time_f(f, t='f'):
 
 
 quantities = ['sales', 'deals']
-operator = Operator(quantities=quantities, samplers={'sales': gamma, 'deals': binom})
+operator = Operator(quantities=quantities, samplers={'sales': Sampler(distribution=gamma, pos_args=(4,), params={'scale': 500}),
+                                                     'deals': Sampler(distribution=binom, params={'n': 30, 'p': .2})})
 operator.sample(['sales', 'deals'], sample_n=1000)
 income = operator.convolution(quantities=('sales', 'deals'), operation='*')
-p_profit = operator.distribution_cdf(3000, income)
+p_profit = operator.distribution_cdf(3000, income, ceil=10**3)
 
 print(p_profit)
