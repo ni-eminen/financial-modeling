@@ -5,10 +5,12 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="3da7e78f-7a1b-49df-b99b-165485dd20d2" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/Sampler.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/interpolation.ipynb" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/modules.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/income-model.ipynb" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/financial-modeling.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/financial-modeling.iml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/main.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/profit.ipynb" beforeDir="false" afterPath="$PROJECT_DIR$/profit.ipynb" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -45,7 +47,8 @@
   <component name="SharedIndexes">
     <attachedChunks>
       <set>
-        <option value="bundled-python-sdk-50da183f06c8-2887949eec09-com.jetbrains.pycharm.pro.sharedIndexes.bundled-PY-233.13135.95" />
+        <option value="bundled-js-predefined-1d06a55b98c1-0b3e54e931b4-JavaScript-PY-241.18034.82" />
+        <option value="bundled-python-sdk-975db3bf15a3-2767605e8bc2-com.jetbrains.pycharm.pro.sharedIndexes.bundled-PY-241.18034.82" />
       </set>
     </attachedChunks>
   </component>
@@ -64,6 +67,12 @@
       <workItem from="1718830527486" duration="511000" />
       <workItem from="1718820282642" duration="8839000" />
       <workItem from="1718919620855" duration="5399000" />
+      <workItem from="1719935436412" duration="671000" />
+      <workItem from="1719936507321" duration="6369000" />
+      <workItem from="1720023780012" duration="1035000" />
+      <workItem from="1720029450114" duration="6715000" />
+      <workItem from="1720102842180" duration="7644000" />
+      <workItem from="1720195047627" duration="845000" />
     </task>
     <servers />
   </component>
