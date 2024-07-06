@@ -1,85 +1,45 @@
-import scipy
 import numpy as np
 import matplotlib.pyplot as plt
 import seaborn as sns
 from scipy.stats import gamma, binom
-import itertools
-from scipy.stats import gaussian_kde
 import time
 
-from Sampler import Sampler
-
-
 class Operator:
-    def __init__(self, quantities: list[str], samplers: dict):
+    def __init__(self):
         """
         :param quantities: A dictionary of type dict[string, scipy distribution]
         """
-        self.quantities = {quantity: {'samples': [], 'interpolation': None, 'sampler': None} for quantity in quantities}
-        for quantity in samplers.keys():
-            self.quantities[quantity]['sampler'] = samplers[quantity]
+        self.quantities = {}
 
-    def sample(self, quantities: list[str], sample_n: int):
-        for q in quantities:
-            self.quantities[q]['samples'] = self.quantities[q]['sampler'].rvs(size=sample_n)
+    def create_quantity(self, name, pdf, cdf):
+        if name not in self.quantities.keys():
+            self.quantities[name] = {}
 
-        return self.quantities
+        self.quantities[name]['pdf'] = pdf
+        self.quantities[name]['cdf'] = cdf
 
-    def convolution(self, quantities: tuple[str], operation: str):
-        """
-        :param quantities: Two distributions that are convoluted into one according to some operation
-        :param operation: Type of operation: '+', '-', '*'
-        :return: A convolved distribution
-        """
-        for q in quantities:
-            if len(self.quantities[q]['samples']) == 0:
-                self.sample([q], 1000)
+    def create_dc_convolution(self, conv_name, c_quantity, d_quantity, operation, domain_d):
+        if conv_name not in self.quantities.keys():
+            self.quantities[conv_name] = {}
 
-        a, b = self.quantities[quantities[0]]['samples'], self.quantities[quantities[1]]['samples']
+        c_quantity_pdf = self.quantities[c_quantity]['pdf']
+        d_quantity_pmf = self.quantities[d_quantity]['pdf']
+        c_quantity_cdf = self.quantities[c_quantity]['cdf']
 
-        z = itertools.product(a, b)
-        if operation == '+':
-            z = [a + b for (a, b) in z]
-        elif operation == '-':
-            z = [a - b for (a, b) in z]
-        elif operation == '*':
-            z = [a * b for (a, b) in z]
+        new_quantity_pdf = lambda z: pdf_product_convolution_discrete_continuous(z, d_quantity_pmf,
+                                                                                 c_quantity_pdf, domain_d)
+        new_quantity_cdf = lambda z: cdf_product_convolution_discrete_continuous(z, d_quantity_pmf,
+                                                                                 c_quantity_cdf, domain_d)
 
-        z = np.array(z)
-
-        return z
-
-    def model_pdf(self, distribution: list):
-        model_density = gaussian_kde(distribution)
-        model_values = np.linspace(min(distribution), max(distribution), 1000)
-        model_pdf = model_density(model_values)
-
-        return model_density, model_pdf
-
-    # def quantity_cdf(self, amt, model_density, quantity):
-    #     probability = np.trapz(y=model_density(np.linspace(amt, max(np.array(quantity)), 1000)),
-    #                            x=np.linspace(amt, max(np.array(quantity)), 1000))
-    #
-    #     return probability
-
-    def distribution_cdf(self, amt, distribution, ceil=10000):
-        interpolated = self.distribution_interpolation(distribution)
-        val = self.interpolated_integral(amt, ceil, interpolated)
-        tot = self.interpolated_integral(0, ceil, interpolated)
-
-        return val / tot
-
-    # TODO: Here the x is wrong, the y's did not come from those x's, they were sampled and we don't know the
-    # TODO: x's at this point. We can find out the x's with the inverse of the cdf, PPF
-    def distribution_interpolation(self, distribution):
-        return scipy.interpolate.interp1d(x=list(range(len(distribution))), y=distribution, fill_value="extrapolate")
-
-    def interpolated_integral(self, a, b, f):
-        result, error = scipy.integrate.quad(f, a, b)
-
-        return result
+        self.quantities[conv_name]['pdf'] = new_quantity_pdf
+        self.quantities[conv_name]['cdf'] = new_quantity_cdf
 
 
+def pdf_product_convolution_discrete_continuous(z, pmf_d, pdf_c, domain_d):
+    return np.sum([pmf_d(x) * pdf_c(z / (x + 1e-6)) * (1/np.abs(x + 1e-6)) for x in domain_d])
+
+def cdf_product_convolution_discrete_continuous(z, pmf_d, cdf_c, domain_d):
+    return np.sum([pmf_d(x) * cdf_c(z / (x + 1e-6)) for x in domain_d])
 
 def plot_sample(sample, kind='kde'):
     sns.displot(sample, kind=kind)
@@ -94,12 +54,46 @@ def time_f(f, t='f'):
     print(t, end - start)
     return x
 
+def prior_to_commission(commission, after_commission):
+    """
+    Gives you the real value of which commission percent has been taken as commission to reach
+    after_commission net value.
+    :param commission: real in domain [0, 1]
+    :param after_commission: real from which commission percentage has been deducted
+    :return: the original value from which commission has not been deducted
+    """
+    after_commission_percentage = 1 - commission
+    before_commission_value = 1 / after_commission_percentage
+
+    return before_commission_value * after_commission
+
+# gamma params
+a = 10
+b = 2000
+
+# binom params
+n = 30
+p = .2
 
 quantities = ['sales', 'deals']
-operator = Operator(quantities=quantities, samplers={'sales': Sampler(distribution=gamma, pos_args=(4,), params={'scale': 500}),
-                                                     'deals': Sampler(distribution=binom, params={'n': 30, 'p': .2})})
-operator.sample(['sales', 'deals'], sample_n=1000)
-income = operator.convolution(quantities=('sales', 'deals'), operation='*')
-p_profit = operator.distribution_cdf(3000, income, ceil=10**3)
+operator = Operator()
+operator.create_quantity(name='sales', pdf=lambda x: gamma.pdf(x, a=a, scale=b), cdf=lambda x: gamma.cdf(x, a=a, scale=b))
+operator.create_quantity(name='n_sales', pdf=lambda x: binom.pmf(x, n=n, p=p), cdf=lambda x: binom.cdf(x, n=n, p=p))
 
+operator.create_dc_convolution(conv_name='income', c_quantity='sales', d_quantity='n_sales', operation='*',
+                               domain_d=range(30))
+
+p_profit = operator.quantities['income']['cdf'](100_000)
 print(p_profit)
+
+x = np.linspace(0, 500000)
+y = [operator.quantities['income']['cdf'](z=x_) for x_ in x]
+
+commission = .2
+fixed_costs = 40_000
+profit = 20_000
+# profit = income - commission - fixed costs
+# commission = .2 * sales income
+p_20_000_profit = operator.quantities['income']['cdf'](prior_to_commission(commission=.2,
+                                                                           after_commission=(profit + fixed_costs)))
+
