@@ -4,6 +4,9 @@ import seaborn as sns
 from scipy.stats import gamma, binom
 import time
 
+from Operation import ContinuousDiscreteProduct
+
+
 class Operator:
     def __init__(self):
         """
@@ -34,6 +37,18 @@ class Operator:
         self.quantities[conv_name]['pdf'] = new_quantity_pdf
         self.quantities[conv_name]['cdf'] = new_quantity_cdf
 
+    def fixed_scale_convolution(self, scalar, quantity):
+        revert = 1 / scalar
+        pdf = lambda x: self.quantities[quantity]['pdf'](revert * x)
+        cdf = lambda x: self.quantities[quantity]['cdf'](revert * x)
+
+        return pdf, cdf
+
+    def fixed_sum_convolution(self, fixed_num, quantity):
+        pdf = lambda x: self.quantities[quantity]['pdf'](x + fixed_num)
+        cdf = lambda x: self.quantities[quantity]['cdf'](x + fixed_num)
+
+        return pdf, cdf
 
 def pdf_product_convolution_discrete_continuous(z, pmf_d, pdf_c, domain_d):
     return np.sum([pmf_d(x) * pdf_c(z / (x + 1e-6)) * (1/np.abs(x + 1e-6)) for x in domain_d])
@@ -97,3 +112,7 @@ profit = 20_000
 p_20_000_profit = operator.quantities['income']['cdf'](prior_to_commission(commission=.2,
                                                                            after_commission=(profit + fixed_costs)))
 
+# now we want to be able to create objectives (goals that we want to model, the really important quantities
+# for the team)
+
+# operator.create_objective ???
