@@ -1,8 +1,12 @@
 import matplotlib.pyplot as plt
 import seaborn as sns
 import time
-def plot_line(x, y):
-    sns.lineplot(x=x, y=y)
+import numpy as np
+def plot_line(x, y, hist=False):
+    if hist:
+        sns.barplot(x=x, y=y)
+    else:
+        sns.lineplot(x=x, y=y)
 
     plt.show()
 
