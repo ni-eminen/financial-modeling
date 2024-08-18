@@ -5,11 +5,12 @@ from helpers import plot_line
 
 
 class Operator:
-    def __init__(self):
+    def __init__(self, name):
         """
         :param quantities: A dictionary of type dict[string, scipy distribution]
         """
         self.quantities = {}
+        self.name = name
 
     def create_quantity(self, name, pdf, cdf, sample, kwargs, domain_type):
         if name not in self.quantities.keys():
@@ -26,19 +27,6 @@ class Operator:
 
         self.quantities[conv_name] = new_quantity
 
-
-    def fixed_scale_convolution(self, scalar, quantity):
-        revert = 1 / scalar
-        pdf = lambda x: self.quantities[quantity]['pdf'](revert * x)
-        cdf = lambda x: self.quantities[quantity]['cdf'](revert * x)
-
-        return pdf, cdf
-
-    def fixed_sum_convolution(self, fixed_num, quantity):
-        pdf = lambda x: self.quantities[quantity]['pdf'](x + fixed_num)
-        cdf = lambda x: self.quantities[quantity]['cdf'](x + fixed_num)
-
-        return pdf, cdf
 
     def visualize_quantity(self, f, quantity):
         a, b = np.min(quantity.samples), np.max(quantity.samples)
