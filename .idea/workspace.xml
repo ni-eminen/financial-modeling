@@ -5,11 +5,10 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="3da7e78f-7a1b-49df-b99b-165485dd20d2" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/Context.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/context.ipynb" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/__init__.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/main_app.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/webapp/__init__.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Operator.py" beforeDir="false" afterPath="$PROJECT_DIR$/Operator.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/main.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -48,6 +47,11 @@
     &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   }
 }</component>
+  <component name="RecentsManager">
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$" />
+    </key>
+  </component>
   <component name="SharedIndexes">
     <attachedChunks>
       <set>
@@ -89,7 +93,9 @@
       <workItem from="1723299280116" duration="3902000" />
       <workItem from="1723569197368" duration="3156000" />
       <workItem from="1723892421988" duration="19395000" />
-      <workItem from="1723918266871" duration="6743000" />
+      <workItem from="1723918266871" duration="7384000" />
+      <workItem from="1724338446681" duration="12036000" />
+      <workItem from="1724428351246" duration="910000" />
     </task>
     <servers />
   </component>
