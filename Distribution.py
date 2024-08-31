@@ -1,21 +1,30 @@
 import numpy as np
-import scipy.integrate as integrate
-import scipy.stats
-from scipy.integrate import quad
-from scipy.stats import rv_histogram
+from scipy.stats import rv_histogram, multinomial
 import itertools
-from scipy.interpolate import CubicSpline
 
 
 class Distribution:
-    def __init__(self, name, pdf, cdf, sample, kwargs, domain_type):
+    def __init__(self, name, pdf, cdf, sample, kwargs, domain_type, parent=None):
         self.name = name
         self.pdf_f = pdf
         self.cdf_f = cdf
         self.kwargs = kwargs
         self.sample_f = sample
+        self.domain_max = 0
+        self.domain_min = 100
         self.samples = self.sample(1000)
+        self.x = []
+        self.update_domain()
         self.domain_type = domain_type
+        self.parent = parent
+
+
+
+    def update_params(self, kwargs):
+        self.kwargs = kwargs
+        self.samples = self.sample(1000)
+
+        return self.samples
 
     def pdf(self, x):
         return self.pdf_f(x, **self.kwargs)
@@ -27,7 +36,73 @@ class Distribution:
         samples = []
         for _ in range(n):
             samples.append(self.sample_f(**self.kwargs))
-        return np.array(samples)
+
+        return samples
+
+    def update_domain(self):
+        a, b = np.min(self.samples), np.max(self.samples)
+        self.domain_min = a
+        self.domain_max = b
+
+        if self.domain_type == 'discrete':
+            self.x = list(range(self.domain_min, self.domain_min + 1))  # Corrected for discrete domain
+        elif self.domain_type == 'continuous':
+            self.x = list(np.linspace(self.domain_min, self.domain_min, 1000))
+
+    def generate_image(self, update_samples=False):
+        if update_samples:
+            self.sample(1000)
+            self.update_domain()
+
+        pdf_samples = [self.pdf(xi) for xi in self.x]
+        pdf_samples = np.array(pdf_samples) / np.sum(pdf_samples)
+        cdf_samples = [self.cdf(xi) for xi in self.x]
+
+        image = {
+            "name": self.name,
+            "operator": self.parent,
+            "samples": self.samples,  # Ensure this is a list
+            "pdf_samples": {
+                "x": self.x,
+                "y": list(pdf_samples)  # Convert numpy array to list
+            },
+            "cdf_samples": {
+                "x": self.x,
+                "y": list(cdf_samples)  # Ensure CDF samples are lists
+            },
+            "categories": [],
+            "domain_type": self.domain_type
+        }
+
+        return image
+
+
+class CategoricalDistribution:
+    def __init__(self, name, sample, kwargs, domain_type, categories):
+        self.values = kwargs.pop('values')
+        self.values = [float(value) for value in self.values]
+        self.name = name
+        self.pdf_f = multinomial.pmf
+        self.kwargs = kwargs
+        self.sample_f = sample
+        self.samples = self.sample(1000)
+        self.domain_type = domain_type
+        self.categories = categories
+
+    def pdf(self, x):
+        x_arr = np.zeros(len(self.kwargs['p']))
+        x_arr[x] = 1
+        return self.pdf_f(x_arr, n=1, **self.kwargs)
+
+    def cdf(self, x):
+        return 1
+
+    def sample(self, n):
+        samples = []
+        for _ in range(n):
+            samples.append(self.sample_f(n=1, **self.kwargs))
+
+        return [self.values[np.argmax(sample)] for sample in samples]
 
 
 class ConvolutionDistribution:
@@ -35,11 +110,7 @@ class ConvolutionDistribution:
         self.dist1 = dist1
         self.dist2 = dist2
         self.conv_operation = conv_operation
-
-        if dist1.domain_type == 'continuous' or dist2.domain_type == 'continuous':
-            self.domain_type = 'continuous'
-        else:
-            self.domain_type = 'discrete'
+        self.domain_type = 'continuous'
 
         d1_samples = self.dist1.sample(1000)
         d2_samples = self.dist2.sample(1000)
@@ -54,7 +125,7 @@ class ConvolutionDistribution:
         elif self.conv_operation == '/':
             self.samples = [a / b for a, b in cartesian if b != 0]
 
-        hist = np.histogram(self.samples, bins=500) # TODO: amt of bins, granularity
+        hist = np.histogram(self.samples, bins=500)  # TODO: amt of bins, granularity
         self.rv_hist = rv_histogram(hist)
 
     def pdf(self, x):

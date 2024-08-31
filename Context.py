@@ -2,8 +2,8 @@ import numpy as np
 import scipy
 from typing import override
 
-from Distribution import Distribution, ConvolutionDistribution
-from Operator import Operator
+from .Distribution import Distribution, ConvolutionDistribution
+from .Operator import Operator
 
 
 class Context(Operator):
