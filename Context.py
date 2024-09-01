@@ -2,7 +2,7 @@ import numpy as np
 import scipy
 from typing import override
 
-from .Distribution import Distribution, ConvolutionDistribution
+from .Distribution import ConvolutionDistribution
 from .Operator import Operator
 
 
@@ -26,11 +26,12 @@ class Context(Operator):
 
         return operator
 
-    def create_convolution(self, conv_name, quantity1, quantity2, operation='*'):
+    def create_convolution(self, conv_name, quantity1, quantity2, operation):
         if conv_name not in self.quantities.keys():
             self.quantities[conv_name] = {}
 
-        new_quantity = ConvolutionDistribution(dist1=quantity1, dist2=quantity2, conv_operation=operation)
+        new_quantity = ConvolutionDistribution(name=conv_name, dist1=quantity1, dist2=quantity2,
+                                               conv_operation=operation, parent=self.name)
 
         self.quantities[conv_name] = new_quantity
 

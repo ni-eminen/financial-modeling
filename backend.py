@@ -34,10 +34,12 @@ class CreateQuantityPayload(BaseModel):
     model_params: dict
     categories: list
 
+
 class UpdateParametersPayload(BaseModel):
     operator_name: str
     quantity_name: str
     params: dict
+
 
 class CreateConvolutionPayload(BaseModel):
     quantity1_name: str
@@ -69,35 +71,21 @@ async def create_operator(name):
         "operator_name": name
     }
 
+
 @app.post("/update-parameters/", status_code=201)
 async def update_parameters(payload: UpdateParametersPayload):
-    operator_name, quantity_name, params = payload['operator_name'], payload['quantity_name'], payload['params']
+    operator_name, quantity_name, params = payload.operator_name, payload.quantity_name, payload.params
     if operator_name == "global":
         operator = ctx
     else:
         operator = ctx.get_operator(name=operator_name)
 
-    quantity = operator['quantities'][quantity_name]
+    quantity = operator.quantities[quantity_name]
     quantity.update_params(params)
 
-    samples = quantity.sample()
+    image = quantity.generate_image(update_samples=True)
 
-    to_return = {
-        "name": quantity_name,
-        "operator": operator.name,
-        "samples": samples,  # Ensure this is a list
-        "pdf_samples": {
-            "x": x,
-            "y": list(pdf_samples)  # Convert numpy array to list
-        },
-        "cdf_samples": {
-            "x": x,
-            "y": list(cdf_samples)  # Ensure CDF samples are lists
-        },
-        "categories": categories,
-        "domain_type": model.domain_type
-    }
-
+    return image
 
 
 @app.post("/create-quantity/", status_code=201)
@@ -156,10 +144,11 @@ async def create_quantity(payload: CreateQuantityPayload):
             "y": list(cdf_samples)  # Ensure CDF samples are lists
         },
         "categories": categories,
-        "domain_type": model.domain_type
+        "domain_type": model.domain_type,
+        "params": model.kwargs
     }
 
-    print(to_return)
+    # to_return = model.generate_image()
 
     return to_return
 

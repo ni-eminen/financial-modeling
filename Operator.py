@@ -19,16 +19,18 @@ class Operator:
 
         if dist_class == 'distribution':
             self.quantities[name] = Distribution(name=name, pdf=pdf, cdf=cdf, sample=sample, kwargs=kwargs,
-                                                 domain_type=domain_type)
+                                                 domain_type=domain_type, parent=self.name)
         elif dist_class == 'categorical':
             self.quantities[name] = CategoricalDistribution(name=name, sample=sample, kwargs=kwargs,
-                                                            domain_type=domain_type, categories=categories)
+                                                            domain_type=domain_type, categories=categories,
+                                                            parent=self.name)
 
-    def create_convolution(self, conv_name, quantity1: Distribution, quantity2: Distribution, operation='*'):
+    def create_convolution(self, conv_name: str, quantity1: Distribution, quantity2: Distribution, operation: str):
         if conv_name not in self.quantities.keys():
             self.quantities[conv_name] = {}
 
-        new_quantity = ConvolutionDistribution(dist1=quantity1, dist2=quantity2, conv_operation=operation)
+        new_quantity = ConvolutionDistribution(name=conv_name, dist1=quantity1, dist2=quantity2,
+                                               conv_operation=operation, parent=self.name)
 
         self.quantities[conv_name] = new_quantity
 
