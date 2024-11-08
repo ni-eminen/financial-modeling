@@ -16,6 +16,7 @@ class Distribution:
         self.samples = self.sample(1000)
         self.update_domain()
         self.parent = parent
+        self.type = "generic"
 
         print(f'samples after init', self.samples)
 
@@ -79,6 +80,7 @@ class Distribution:
 
         to_return = {
             "name": self.name,
+            "type": self.type,
             "operator": self.parent,
             "samples": self.samples,  # Ensure this is a list
             "pdf_samples": {
@@ -99,6 +101,7 @@ class Distribution:
 
 class CategoricalDistribution:
     def __init__(self, name, sample, kwargs, domain_type, categories, parent):
+        self.type = "categorical"
         self.categories = categories
         self.parent = parent
         self.domain_type = domain_type
@@ -145,6 +148,7 @@ class CategoricalDistribution:
 
         image = {
             "name": self.name,
+            "type": self.type,
             "operator": self.parent,
             "samples": self.samples,  # Ensure this is a list
             "pdf_samples": {
@@ -171,6 +175,7 @@ class ConvolutionDistribution:
         self.dist2 = dist2
         self.conv_operation = conv_operation
         self.domain_type = 'continuous'
+        self.type = "convolution"
 
         d1_samples = self.dist1.sample(1000)
         d2_samples = self.dist2.sample(1000)
@@ -227,6 +232,7 @@ class ConvolutionDistribution:
 
         image = {
             "name": self.name,
+            "type": self.type,
             "operator": self.parent,
             "samples": self.samples,  # Ensure this is a list
             "pdf_samples": {

@@ -34,6 +34,10 @@ class CreateQuantityPayload(BaseModel):
     model_params: dict
     categories: list
 
+class GetNewSamplesPayload(BaseModel):
+    operator_name: str
+    quantity_name: str
+
 
 class UpdateParametersPayload(BaseModel):
     operator_name: str
@@ -62,6 +66,18 @@ def get_operator(ctx, name):
 async def root():
     print('a call made')
     return {"message": "Hello World"}
+
+# TODO: Now implement in front-end a mechanism that detects when a convolution term is updated and update the
+# corresponding convolutions
+@app.get("/get-new-samples/", status_code=201)
+async def get_new_samples(payload: GetNewSamplesPayload):
+    operator_name, quantity_name = payload.operator_name, payload.quantity_name
+    operator = get_operator(ctx, operator_name)
+    quantity = operator.quantities[quantity_name]
+
+    new_samples = quantity.sample(1000)
+
+    return {"samples": new_samples}
 
 
 @app.post("/create-operator/{name}", status_code=201)
@@ -133,6 +149,7 @@ async def create_quantity(payload: CreateQuantityPayload):
 
     to_return = {
         "name": quantity_name,
+        "type": model.type,
         "operator": operator.name,
         "samples": samples,  # Ensure this is a list
         "pdf_samples": {
@@ -190,6 +207,7 @@ async def create_convolution(payload: CreateConvolutionPayload):
 
     return {
         "name": convolution_name,
+        "type": "convolution",
         "operator": owner,
         "samples": samples,
         "pdf_samples": {
