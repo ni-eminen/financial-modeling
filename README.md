@@ -1,4 +1,4 @@
-# FastAPI Backend for Statistical Operations
+# Financial modelling for SMBs
 
 This repository contains a FastAPI backend designed for creating and managing statistical models, quantities, and convolutions for financial outcome prediction. The application supports operations with various probability distributions, including binomial, gamma, and categorical models, and provides APIs for sampling, parameter updates, and convolution creation.
 
