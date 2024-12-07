@@ -107,14 +107,6 @@ b = 2000
 # binom params
 n = 30
 p = .2
-# operator.create_quantity('s1', gamma.pdf, cdf=gamma.cdf, sample=gamma.rvs, kwargs={'a': a, 'scale': b},
-#                          domain_type='continuous')
-# operator.create_quantity('s2', gamma.pdf, cdf=gamma.cdf, sample=gamma.rvs, kwargs={'a': a, 'scale': b},
-#                          domain_type='continuous')
-# operator.create_quantity('n_sales', binom.pmf, cdf=binom.cdf, sample=binom.rvs, kwargs={'n': 30, 'p': .2},
-#                          domain_type='discrete')
-# operator.create_convolution('s3', operator.quantities['s1'], operator.quantities['s2'], '*')
-# operator.create_convolution('s4', operator.quantities['s2'], operator.quantities['s3'], '*')
 operator_selected = False
 ctx = Context(name='context')
 print('Start by creating quantities')

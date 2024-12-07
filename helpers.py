@@ -2,6 +2,8 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 import time
 import numpy as np
+
+
 def plot_line(x, y, hist=False):
     if hist:
         sns.barplot(x=x, y=y)
@@ -10,12 +12,10 @@ def plot_line(x, y, hist=False):
 
     plt.show()
 
-
 def plot_sample(sample, kind='kde'):
     sns.displot(sample, kind=kind)
 
     plt.show()
-
 
 def time_f(f, t='f'):
     start = time.time()
