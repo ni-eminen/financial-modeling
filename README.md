@@ -142,9 +142,3 @@ main.py                 # CLI version of the app, no front-end needed
 ## License
 
 This project is licensed under the MIT License. See the LICENSE file for details.
-
-```
-
-This `README.md` provides an overview, installation guide, and detailed API documentation for easy onboarding and usage of the backend. Let me know if you need additional sections or modifications!
-
-```
