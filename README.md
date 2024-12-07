@@ -33,12 +33,11 @@ Refer to [this repository](https://github.com/ni-eminen/financial-modeling-front
 ## Installation
 
 1. Clone the repository:
+
    ```bash
    git clone git@github.com:ni-eminen/financial-modeling.git
    cd financial-modeling
    ```
-
-````
 
 2. Create a virtual environment and activate it:
 
@@ -148,4 +147,4 @@ This project is licensed under the MIT License. See the LICENSE file for details
 
 This `README.md` provides an overview, installation guide, and detailed API documentation for easy onboarding and usage of the backend. Let me know if you need additional sections or modifications!
 
-````
+```
