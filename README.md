@@ -1,4 +1,3 @@
-````markdown
 # FastAPI Backend for Statistical Operations
 
 This repository contains a FastAPI backend designed for creating and managing statistical models, quantities, and convolutions for financial outcome prediction. The application supports operations with various probability distributions, including binomial, gamma, and categorical models, and provides APIs for sampling, parameter updates, and convolution creation.
@@ -38,6 +37,7 @@ Refer to [this repository](https://github.com/ni-eminen/financial-modeling-front
    git clone git@github.com:ni-eminen/financial-modeling.git
    cd financial-modeling
    ```
+
 ````
 
 2. Create a virtual environment and activate it:
@@ -147,4 +147,5 @@ This project is licensed under the MIT License. See the LICENSE file for details
 ```
 
 This `README.md` provides an overview, installation guide, and detailed API documentation for easy onboarding and usage of the backend. Let me know if you need additional sections or modifications!
-```
+
+````
