@@ -18,8 +18,6 @@ class Distribution:
         self.parent = parent
         self.type = "generic"
 
-        print(f'samples after init', self.samples)
-
     def pdf(self, x):
         return self.pdf_f(x, **self.kwargs)
 
@@ -28,6 +26,7 @@ class Distribution:
 
     def sample(self, n):
         samples = []
+        print(self.kwargs)
         for _ in range(n):
             samples.append(self.sample_f(**self.kwargs))
 

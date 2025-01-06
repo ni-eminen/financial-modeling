@@ -1,11 +1,10 @@
 import random
-
 import numpy as np
 from pydantic import BaseModel
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from scipy.stats import binom, gamma, multinomial
-
+from scipy.stats import binom, gamma, multinomial, rv_continuous, rv_discrete
+import scipy
 from .Operator import Operator
 from .BackendConfig import ctx
 
@@ -33,6 +32,7 @@ class CreateQuantityPayload(BaseModel):
     model: str
     model_params: dict
     categories: list
+
 
 class GetNewSamplesPayload(BaseModel):
     operator_name: str
@@ -66,6 +66,7 @@ def get_operator(ctx, name):
 async def root():
     print('a call made')
     return {"message": "Hello World"}
+
 
 # TODO: Now implement in front-end a mechanism that detects when a convolution term is updated and update the
 # corresponding convolutions
@@ -110,28 +111,22 @@ async def create_quantity(payload: CreateQuantityPayload):
 
     quantity_name = payload.quantity_name
     quantity_model = payload.model
-    args_dict = payload.model_params
+    model_params = payload.model_params
     categories = []
-
-    if quantity_model == 'binomial':
-        args_dict['n'] = int(args_dict['n'])
-        args_dict['p'] = float(args_dict['p'])
-        operator.create_quantity(name=quantity_name, pdf=binom.pmf, cdf=binom.cdf,
-                                 sample=binom.rvs, kwargs=args_dict, domain_type='discrete')
-    elif quantity_model == 'gamma':
-        args_dict['a'] = float(args_dict['a'])
-        args_dict['scale'] = float(args_dict['scale'])
-        operator.create_quantity(name=quantity_name, pdf=gamma.pdf, cdf=gamma.cdf,
-                                 sample=gamma.rvs, kwargs=args_dict, domain_type='continuous')
-    elif quantity_model == 'categorical':
-        print(f'args for categorical: {args_dict}')
-        categories = payload.categories
-        args_dict['p'] = [float(p) for p in args_dict['p']]
-        args_dict_ = args_dict.copy()
-        args_dict_.pop('categories', None)
-        print(quantity_name)
-        operator.create_quantity(name=quantity_name, sample=multinomial.rvs, kwargs=args_dict_,
-                                 domain_type='categorical', dist_class='categorical', categories=categories)
+    scipy_quantity = getattr(scipy.stats, quantity_model)
+    if isinstance(scipy_quantity, rv_continuous):
+        operator.create_quantity(quantity_name, pdf=scipy_quantity.pdf, cdf=scipy_quantity.cdf,
+                                 sample=scipy_quantity.rvs, kwargs=model_params, domain_type="continuous")
+    elif isinstance(scipy_quantity, rv_discrete):
+        operator.create_quantity(quantity_name, pdf=scipy_quantity.pmf, cdf=scipy_quantity.cdf,
+                                 sample=scipy_quantity.rvs, kwargs=model_params, domain_type="discrete")
+    # elif quantity_model == 'categorical':
+    #     categories = payload.categories
+    #     args_dict['p'] = [float(p) for p in args_dict['p']]
+    #     args_dict_ = args_dict.copy()
+    #     args_dict_.pop('categories', None)
+    #     operator.create_quantity(name=quantity_name, sample=multinomial.rvs, kwargs=args_dict_,
+    #                              domain_type='categorical', dist_class='categorical', categories=categories)
 
     model = operator.quantities[quantity_name]
     samples = list(model.samples)
@@ -164,8 +159,6 @@ async def create_quantity(payload: CreateQuantityPayload):
         "domain_type": model.domain_type,
         "params": model.kwargs
     }
-
-    # to_return = model.generate_image()
 
     return to_return
 
