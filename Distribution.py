@@ -98,9 +98,9 @@ class Distribution:
         return to_return
 
 
-class CategoricalDistribution:
+class multinomialDistribution:
     def __init__(self, name, sample, kwargs, domain_type, categories, parent):
-        self.type = "categorical"
+        self.type = "multinomial"
         self.categories = categories
         self.parent = parent
         self.domain_type = domain_type
@@ -119,6 +119,7 @@ class CategoricalDistribution:
         x_arr[x] = 1
         return self.pdf_f(x_arr, n=1, **self.kwargs)
 
+    # TODO: Multinomial cdf inference
     def cdf(self, x):
         return 1
 

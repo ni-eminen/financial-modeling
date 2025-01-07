@@ -7,6 +7,7 @@
     <list default="true" id="3da7e78f-7a1b-49df-b99b-165485dd20d2" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Distribution.py" beforeDir="false" afterPath="$PROJECT_DIR$/Distribution.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Operator.py" beforeDir="false" afterPath="$PROJECT_DIR$/Operator.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/backend.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -102,7 +103,7 @@
       <workItem from="1725188808337" duration="17923000" />
       <workItem from="1725266962598" duration="1619000" />
       <workItem from="1725287736103" duration="4023000" />
-      <workItem from="1735986481641" duration="19937000" />
+      <workItem from="1735986481641" duration="29104000" />
     </task>
     <servers />
   </component>

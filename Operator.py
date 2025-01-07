@@ -1,6 +1,6 @@
 import numpy as np
 
-from .Distribution import Distribution, ConvolutionDistribution, CategoricalDistribution
+from .Distribution import Distribution, ConvolutionDistribution, multinomialDistribution
 from .helpers import plot_line
 
 
@@ -17,11 +17,12 @@ class Operator:
         if name not in self.quantities.keys():
             self.quantities[name] = {}
 
+
         if dist_class == 'distribution':
             self.quantities[name] = Distribution(name=name, pdf=pdf, cdf=cdf, sample=sample, kwargs=kwargs,
                                                  domain_type=domain_type, parent=self.name)
-        elif dist_class == 'categorical':
-            self.quantities[name] = CategoricalDistribution(name=name, sample=sample, kwargs=kwargs,
+        elif dist_class == 'multinomial':
+            self.quantities[name] = multinomialDistribution(name=name, sample=sample, kwargs=kwargs,
                                                             domain_type=domain_type, categories=categories,
                                                             parent=self.name)
 

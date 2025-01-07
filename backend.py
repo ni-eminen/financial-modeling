@@ -114,19 +114,20 @@ async def create_quantity(payload: CreateQuantityPayload):
     model_params = payload.model_params
     categories = []
     scipy_quantity = getattr(scipy.stats, quantity_model)
-    if isinstance(scipy_quantity, rv_continuous):
+
+    if quantity_model == 'multinomial':
+        categories = payload.categories
+        model_params['p'] = [float(p) for p in model_params['p']]
+        args_dict_ = model_params.copy()
+        args_dict_.pop('categories', None)
+        operator.create_quantity(name=quantity_name, sample=scipy_quantity.rvs, kwargs=args_dict_,
+                                 domain_type='multinomial', dist_class='multinomial', categories=categories)
+    elif isinstance(scipy_quantity, rv_continuous):
         operator.create_quantity(quantity_name, pdf=scipy_quantity.pdf, cdf=scipy_quantity.cdf,
                                  sample=scipy_quantity.rvs, kwargs=model_params, domain_type="continuous")
     elif isinstance(scipy_quantity, rv_discrete):
         operator.create_quantity(quantity_name, pdf=scipy_quantity.pmf, cdf=scipy_quantity.cdf,
                                  sample=scipy_quantity.rvs, kwargs=model_params, domain_type="discrete")
-    # elif quantity_model == 'categorical':
-    #     categories = payload.categories
-    #     args_dict['p'] = [float(p) for p in args_dict['p']]
-    #     args_dict_ = args_dict.copy()
-    #     args_dict_.pop('categories', None)
-    #     operator.create_quantity(name=quantity_name, sample=multinomial.rvs, kwargs=args_dict_,
-    #                              domain_type='categorical', dist_class='categorical', categories=categories)
 
     model = operator.quantities[quantity_name]
     samples = list(model.samples)
@@ -135,7 +136,7 @@ async def create_quantity(payload: CreateQuantityPayload):
         x = list(range(a, b + 1))  # Corrected for discrete domain
     elif model.domain_type == 'continuous':
         x = list(np.linspace(a, b, 1000))
-    elif model.domain_type == 'categorical':
+    elif model.domain_type == 'multinomial':
         x = list(range(len(model.categories)))
 
     pdf_samples = [model.pdf(xi) for xi in x]
