@@ -2,6 +2,7 @@ import numpy as np
 from scipy.stats import rv_histogram, multinomial
 import itertools
 
+DEFAULT_SAMPLE_AMT = 1000
 
 class Distribution:
     def __init__(self, name, pdf, cdf, sample, kwargs, domain_type, parent):
@@ -13,7 +14,7 @@ class Distribution:
         self.sample_f = sample
         self.domain_max = 0
         self.domain_min = 100
-        self.samples = self.sample(1000)
+        self.samples = self.sample(DEFAULT_SAMPLE_AMT)
         self.update_domain()
         self.parent = parent
         self.type = "generic"
@@ -34,7 +35,7 @@ class Distribution:
 
     def update_params(self, kwargs):
         self.kwargs = kwargs
-        self.samples = self.sample(1000)
+        self.samples = self.sample(DEFAULT_SAMPLE_AMT)
         self.update_domain()
 
     def update_domain(self):
@@ -111,7 +112,7 @@ class multinomialDistribution:
         self.pdf_f = multinomial.pmf
         self.kwargs = kwargs
         self.sample_f = sample
-        self.samples = self.sample(1000)
+        self.samples = self.sample(DEFAULT_SAMPLE_AMT)
         self.update_domain()
 
     def pdf(self, x):
@@ -132,7 +133,7 @@ class multinomialDistribution:
 
     def update_params(self, kwargs):
         self.kwargs = kwargs
-        self.samples = self.sample(1000)
+        self.samples = self.sample(DEFAULT_SAMPLE_AMT)
         self.update_domain()
 
     def update_domain(self):
@@ -140,7 +141,7 @@ class multinomialDistribution:
 
     def generate_image(self, update_samples=False):
         if update_samples:
-            self.samples = self.sample(1000)
+            self.samples = self.sample(DEFAULT_SAMPLE_AMT)
 
         pdf_samples = [self.pdf(xi) for xi in self.x]
         pdf_samples = np.array(pdf_samples) / np.sum(pdf_samples)
@@ -177,8 +178,8 @@ class ConvolutionDistribution:
         self.domain_type = 'continuous'
         self.type = "convolution"
 
-        d1_samples = self.dist1.sample(1000)
-        d2_samples = self.dist2.sample(1000)
+        d1_samples = self.dist1.sample(DEFAULT_SAMPLE_AMT)
+        d2_samples = self.dist2.sample(DEFAULT_SAMPLE_AMT)
         cartesian = itertools.product(d1_samples, d2_samples)
 
         if self.conv_operation == '*':
@@ -207,7 +208,7 @@ class ConvolutionDistribution:
         # we have to keep track of the distributions and params that make up the convolution and update those
         # create the convolution again, sample it and create the new image
         self.kwargs = kwargs
-        self.samples = self.sample(1000)
+        self.samples = self.sample(DEFAULT_SAMPLE_AMT)
 
     def update_domain(self):
         a, b = np.min(self.samples), np.max(self.samples)
@@ -221,7 +222,7 @@ class ConvolutionDistribution:
 
     def generate_image(self, update_samples=False):
         if update_samples:
-            self.samples = self.sample(1000)
+            self.samples = self.sample(DEFAULT_SAMPLE_AMT)
 
         if self.categories == None:
             self.categories = []

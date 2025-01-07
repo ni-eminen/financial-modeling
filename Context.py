@@ -1,6 +1,6 @@
 import numpy as np
 import scipy
-from typing import override
+#from typing import override
 
 from .Distribution import ConvolutionDistribution
 from .Operator import Operator
