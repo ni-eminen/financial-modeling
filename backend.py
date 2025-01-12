@@ -53,6 +53,26 @@ class CreateConvolutionPayload(BaseModel):
     operator1_name: str
     operator2_name: str
 
+# Pydantic models
+class Message(BaseModel):
+    role: str
+    content: str
+
+class UserMessage(BaseModel):
+    message: str
+
+class CollectedData(BaseModel):
+    name: str = ""
+    email: str = ""
+    purpose: str = ""
+    preferences: str = ""
+
+class ConversationState(BaseModel):
+    messages: List[Message]
+    current_step: str
+    collected_data: CollectedData
+    last_updated: datetime
+
 
 def get_operator(ctx, name):
     if name == "global":
