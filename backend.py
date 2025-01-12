@@ -67,6 +67,46 @@ async def root():
     print('a call made')
     return {"message": "Hello World"}
 
+@app.post("/api/message")
+async def handle_message(
+    user_message: UserMessage,
+    session_id: str = Depends(get_session)
+):
+    state = sessions[session_id]
+    
+    # Add user message
+    state.messages.append(Message(role="user", content=user_message.message))
+    
+    try:
+        # Get OpenAI response
+        response = openai.ChatCompletion.create(
+            model="gpt-3.5-turbo",
+            messages=[msg.dict() for msg in state.messages]
+        )
+        
+        # Add assistant response
+        assistant_message = Message(
+            role="assistant",
+            content=response.choices[0].message.content
+        )
+        state.messages.append(assistant_message)
+        
+        # Update session state
+        state.last_updated = datetime.now()
+        sessions[session_id] = state
+        
+        # Return visible messages
+        return {
+            "messages": [
+                msg.dict() for msg in state.messages if msg.role != "system"
+            ],
+            "currentStep": state.current_step
+        }
+        
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
 
 # TODO: Now implement in front-end a mechanism that detects when a convolution term is updated and update the
 # corresponding convolutions
